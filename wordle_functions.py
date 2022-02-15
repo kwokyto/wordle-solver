@@ -25,7 +25,6 @@ def valid_indices(indices, length):
 def get_indices(possible_words):
     print("\nThere are 20 or less remaining possibilities, are there any words in the list that you know are definitely wrong?")
     count = 0
-    print(possible_words)
     for word in possible_words:
         print("[", count, "] ", word, sep="")
         count += 1
@@ -71,17 +70,6 @@ def get_score():
         print("\nThis is not a valid score.")
         score = input("Enter the score of each letter, y for yes (green), n for no (grey), m for maybe (yellow). (e.g. nymny)\n").lower()
     return score
-
-# def get_letter_frequency(possible_words):
-#     long_string = ""
-#     for word in possible_words:
-#         long_string += word
-    
-#     letter_frequency = {}
-#     for char in "abcdefghijklmnopqrstuvwxyz":
-#         letter_frequency[char] = long_string.count(char) / len(long_string)
-    
-#     return letter_frequency
 
 def get_letter_frequency(possible_words):
     letter_frequency = {}

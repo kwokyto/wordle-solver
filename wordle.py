@@ -1,3 +1,4 @@
+from operator import not_
 from wordle_functions import (get_indices, get_letter_frequency, get_score, get_word_guessed, word_list)
 
 WORD_LENGTH = 5
@@ -30,8 +31,20 @@ while len(possible_words) > 1:
         for char in unknown:
             if char in word and char not in inside_word.keys():
                 useful_score += letter_frequency[char]
-            if char in word and char in inside_word.keys():
-                useful_score += (letter_frequency[char] / 100)
+        
+        for i in range(WORD_LENGTH):
+            char = word[i]
+            # we already know the position of this char
+            if char in confirmed_char.keys():
+                continue 
+            # we know this char is not inside
+            if char in not_inside_word:
+                continue
+            
+            if char not in inside_word.keys():
+                continue
+            if i in inside_word[char]:
+                useful_score += (letter_frequency[char] / len(inside_word[char])**2)
         
         if useful_score == max_useful_score:
             useful_words.append(word)
@@ -79,7 +92,7 @@ while len(possible_words) > 1:
             if i in inside_word[char]:
                 inside_word[char].remove(i)
 
-    # for debugging
+    # # for debugging
     # print(inside_word)
     # print(confirmed_char)
 
@@ -88,7 +101,7 @@ while len(possible_words) > 1:
     while(check):
         check = False
         for char in inside_word.keys():
-            if len(inside_word[char]) != 1:
+            if len(inside_word[char]) > 1:
                 continue
             if char in confirmed_char.keys():
                 continue
@@ -105,6 +118,22 @@ while len(possible_words) > 1:
                 if i in inside_word[char_inner]:
                     inside_word[char_inner].remove(i)
             break
+
+        for i in range(WORD_LENGTH):
+            char = possible_words[0][i]
+            if char in confirmed_char.keys():
+                continue
+            all_same = True
+            for word in possible_words:
+                if word[i] != char:
+                    all_same = False
+                    break
+            if all_same:
+                check = True
+                inside_word[char] = []
+                if char not in confirmed_char.keys():
+                    confirmed_char[char] = []
+                confirmed_char[char].append(i)
 
     # for debugging
     # print(inside_word)
@@ -137,21 +166,20 @@ while len(possible_words) > 1:
             if char not in word:
                 is_possible = False
                 break
-            for char_i in range(WORD_LENGTH):
-                if word[char_i] != char:
-                    continue
-                if char_i in inside_word[char]:
-                    continue
-                if char in confirmed_char.keys() and char_i not in confirmed_char[char]:
-                    is_possible = False
-                    break
+
+        # if char is allowed to be in that position
+        for char_i in range(WORD_LENGTH):
+            char = word[char_i]
+            if (char in inside_word.keys() and char_i not in inside_word[char]) and (char in confirmed_char.keys() and char_i not in confirmed_char[char]):
+                is_possible = False
+                break
         
         # remove word if not possible
         if not is_possible:
             possible_words.pop(word_i)
     
     # remove bad words
-    if len(possible_words) <= 20:
+    if len(possible_words) <= 20 and len(possible_words) > 1:
         to_remove_indices = get_indices(possible_words)
         for i in to_remove_indices:
             possible_words.pop(i)
