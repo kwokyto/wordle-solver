@@ -1,4 +1,3 @@
-from operator import not_
 from wordle_functions import (get_indices, get_letter_frequency, get_score, get_word_guessed, word_list)
 
 WORD_LENGTH = 5
